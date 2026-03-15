@@ -39,8 +39,14 @@ def list_movies():
     except Exception as e:
         return {"movies": []}
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "ml_service": ML_SERVICE_URL}
+
 if __name__ == "__main__":
     import uvicorn
     import os
+    # Priority: 1. Environment Variable 'PORT' (Railway) 2. Hardcoded 8000
     port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Backend Gateway starting on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
