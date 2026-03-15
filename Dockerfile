@@ -46,4 +46,6 @@ COPY start_all.sh /app/start_all.sh
 RUN chmod +x /app/start_all.sh
 
 # Railway uses $PORT, so we need to substitute it in the nginx config
-CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/movie.conf && /app/start_all.sh"]
+# Railway uses $PORT, so we need to substitute it in the nginx config
+CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/sites-enabled/movie && /app/start_all.sh"]
+

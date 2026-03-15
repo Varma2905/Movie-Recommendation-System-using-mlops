@@ -6,22 +6,31 @@ export BACKEND_PORT=8000
 export ML_SERVICE_URL="http://127.0.0.1:$ML_PORT"
 
 echo "------------------------------------------------"
-echo "🌟 Starting Movie Recommendation System Bundle"
+echo "🌟 MOVIE RECOMMENDATION SYSTEM BUNDLE"
 echo "------------------------------------------------"
+echo "📍 Railway Port: $PORT"
+echo "📍 Backend Port: $BACKEND_PORT"
+echo "📍 ML Port:      $ML_PORT"
+
+# Debug: Show the generated Nginx config
+echo "📝 Verifying Nginx Configuration..."
+cat /etc/nginx/sites-enabled/movie | grep "listen"
 
 # Start ML Service
-echo "📦 [1/3] Starting ML Service on port $ML_PORT..."
+echo "📦 [1/3] Starting ML Service..."
 cd /app/ml-service && uvicorn main:app --host 0.0.0.0 --port $ML_PORT &
 
 # Start Backend
-echo "🚀 [2/3] Starting Backend Gateway on port $BACKEND_PORT..."
+echo "🚀 [2/3] Starting Backend Gateway..."
 cd /app/backend && uvicorn main:app --host 0.0.0.0 --port $BACKEND_PORT &
 
-# Wait a moment for services to bind
+# Wait for services to bind
+echo "⏳ Waiting for services to wake up..."
 sleep 5
 
-echo "🌐 [3/3] Starting Nginx on port $PORT..."
+echo "🌐 [3/3] Launching Nginx..."
 # Start Nginx in the foreground
 nginx -g "daemon off;"
+
 
 
