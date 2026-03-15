@@ -17,8 +17,8 @@ COPY . .
 # Set working directory to the streamlit app folder
 WORKDIR /app/streamlit-app
 
-# Expose the port Streamlit uses
-EXPOSE 8501
+# Expose the port (Railway uses $PORT, so we don't strictly need this, but good practice)
+EXPOSE 8080
 
-# Run the app
-CMD ["streamlit", "run", "app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+# Run the app using the PORT environment variable provided by Railway
+CMD ["sh", "-c", "streamlit run app.py --server.port ${PORT:-8080} --server.address 0.0.0.0"]
