@@ -6,6 +6,10 @@ import './App.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+if (window.location.hostname !== 'localhost' && API_URL.includes('localhost')) {
+  console.warn("⚠️ Warning: Frontend is running on a server, but API_URL is still pointing to 'localhost'. Please set REACT_APP_API_URL environment variable in Railway.");
+}
+
 function App() {
   const [movieTitle, setMovieTitle] = useState('');
   const [recommendations, setRecommendations] = useState([]);

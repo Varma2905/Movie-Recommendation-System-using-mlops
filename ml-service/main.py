@@ -22,10 +22,14 @@ def load_resources():
     """Load model artifacts from disk."""
     global similarity, movies
     if not os.path.exists(MODEL_PATH) or not os.path.exists(MOVIES_PATH):
-        print("Model files not found. Run training first.")
+        print(f"Model files not found! Searched in: {os.path.abspath('model')}")
+        print("Expected paths:")
+        print(f" - {os.path.abspath(MODEL_PATH)}")
+        print(f" - {os.path.abspath(MOVIES_PATH)}")
         return False
     
     try:
+        print(f"Loading resources from {os.path.abspath('model')}...")
         with open(MODEL_PATH, 'rb') as f:
             similarity = pickle.load(f)
         with open(MOVIES_PATH, 'rb') as f:

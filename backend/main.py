@@ -15,6 +15,7 @@ app.add_middleware(
 
 # ML Service URL (internal or external)
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://localhost:8001")
+print(f"Backend started. Using ML Service at: {ML_SERVICE_URL}")
 
 @app.get("/")
 def read_root():
