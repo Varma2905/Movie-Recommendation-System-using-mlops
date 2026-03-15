@@ -1,19 +1,45 @@
-# Build stage for React
-FROM node:18-alpine as build
-WORKDIR /app
+# Combined Dockerfile for Movie Recommendation System
+# Runs ML Service, Backend, and Frontend (via Nginx) in one container.
+
+# --- Stage 1: Build Frontend ---
+FROM node:18-slim AS frontend-build
+WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
-# Set API URL for production (You will provide this in Railway Variables)
-ARG REACT_APP_API_URL
+# In production, we use relative paths via Nginx proxy
+ARG REACT_APP_API_URL=/api
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build
 
-# Production stage using Nginx
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-# Copy nginx config template
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-EXPOSE 80
-# Railway provides $PORT, Nginx will use it via the template
-CMD ["nginx", "-g", "daemon off;"]
+# --- Stage 2: Final Image ---
+FROM python:3.9-slim
+
+# Install Nginx and other utilities
+RUN apt-get update && apt-get install -y nginx gettext-base && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Backend and ML Service code
+COPY backend /app/backend
+COPY ml-service /app/ml-service
+
+# Install Python dependencies for both
+RUN pip install --no-cache-dir fastapi uvicorn requests pandas numpy scikit-learn joblib pickle-mixin
+
+# Ensure model exists (run training if not present)
+# Note: In a real MLOps flow, models should be bundled or downloaded from a registry
+RUN cd /app/ml-service && python training/train.py
+
+# Copy Frontend build to Nginx directory
+COPY --from=frontend-build /app/frontend/build /usr/share/nginx/html
+
+# Copy Nginx config template
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
+
+# Copy and prepare startup script
+COPY start_all.sh /app/start_all.sh
+RUN chmod +x /app/start_all.sh
+
+# Railway uses $PORT, so we need to substitute it in the nginx config
+CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf && /app/start_all.sh"]
