@@ -2,11 +2,9 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (only if really needed, keeping it minimal)
 RUN apt-get update && apt-get install -y \
     build-essential \
-    curl \
-    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install
