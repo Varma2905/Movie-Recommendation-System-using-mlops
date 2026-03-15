@@ -18,17 +18,21 @@ FROM python:3.9-slim
 # Install Nginx and other utilities
 RUN apt-get update && apt-get install -y nginx gettext-base && rm -rf /var/lib/apt/lists/*
 
+# Remove default nginx site to avoid conflicts
+RUN rm /etc/nginx/sites-enabled/default
+
 WORKDIR /app
 
 # Copy Backend and ML Service code
 COPY backend /app/backend
 COPY ml-service /app/ml-service
 
-# Install Python dependencies for both
-RUN pip install --no-cache-dir fastapi uvicorn requests pandas numpy scikit-learn joblib pickle-mixin
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure model exists (run training if not present)
-# Note: In a real MLOps flow, models should be bundled or downloaded from a registry
+# Ensure model directory exists and train it
+RUN mkdir -p /app/ml-service/model
 RUN cd /app/ml-service && python training/train.py
 
 # Copy Frontend build to Nginx directory
@@ -42,4 +46,4 @@ COPY start_all.sh /app/start_all.sh
 RUN chmod +x /app/start_all.sh
 
 # Railway uses $PORT, so we need to substitute it in the nginx config
-CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf && /app/start_all.sh"]
+CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/movie.conf && /app/start_all.sh"]

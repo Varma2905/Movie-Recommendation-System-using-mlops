@@ -1,0 +1,9 @@
+# Ignore heavy model artifacts and tracking data
+model/
+mlruns/
+mlflow.db
+__pycache__/
+*.pyc
+.env
+venv/
+node_modules/
