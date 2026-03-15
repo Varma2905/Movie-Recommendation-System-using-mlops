@@ -4,10 +4,11 @@ import { Search, Film, Loader2 } from 'lucide-react';
 import MovieCard from './components/MovieCard';
 import './App.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 
+  (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '/api');
 
-if (window.location.hostname !== 'localhost' && API_URL.includes('localhost')) {
-  console.warn("⚠️ Warning: Frontend is running on a server, but API_URL is still pointing to 'localhost'. Please set REACT_APP_API_URL environment variable in Railway.");
+if (window.location.hostname !== 'localhost' && (!API_URL || API_URL.includes('localhost'))) {
+  console.warn("⚠️ Warning: Frontend is running on a server, but API_URL is still pointing to 'localhost' or is empty.");
 }
 
 function App() {
