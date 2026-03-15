@@ -52,7 +52,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <h1><Film size={32} /> Movie<span>Mind</span></h1>
+        <h1><span>🍿</span> Movie<span>Mind</span></h1>
         <p>AI-Powered Recommendations for Your Next Binge</p>
       </header>
 
